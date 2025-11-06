@@ -1,0 +1,37 @@
+# 编译生成的文件
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio 设置
+.vs/
+*.user
+*.suo
+
+# NuGet 包
+packages/
+*.nupkg
+
+# 依赖文件夹
+node_modules/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+logs/
+
+# 自定义要忽略的文件夹
+**/output/
+**/Output/
+
+# 忽略的DLL_文件夹下的内容
+**/DLL_/*.dll
+**/图片合/*
+!**/图片合/README_img.md
+**/AreaDetect/*
+**/新建文件夹/*

@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartAgri.Views.AutoLoginPage"
+             Title="启动中">
+    <ContentPage.Resources>
+        <!-- 如果全局给 Label 设置了不含中文字形的字体(如 OpenSans)，这里将其清空以使用系统字体 -->
+        <Style TargetType="Label">
+            <Setter Property="FontFamily" Value="{x:Null}" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="FontFamily" Value="{x:Null}" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid Padding="24" RowDefinitions="*,Auto,Auto,*,Auto" ColumnDefinitions="*">
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="True"
+                           Color="{DynamicResource Primary}"
+                           HeightRequest="32"
+                           SemanticProperties.Description="正在自动登录，请稍候" />
+        <Label Grid.Row="2"
+               Text="正在自动登录，请稍候…"
+               HorizontalTextAlignment="Center"
+               TextColor="#666" />
+        <Button Grid.Row="4"
+                Text="取消并转到登录"
+                Clicked="OnCancelClicked" />
+    </Grid>
+</ContentPage>

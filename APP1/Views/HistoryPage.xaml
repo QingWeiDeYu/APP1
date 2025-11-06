@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:viewmodels="clr-namespace:SmartAgri.ViewModels"
+             xmlns:models="clr-namespace:SmartAgri.Models"
+             x:Class="SmartAgri.Views.HistoryPage"
+             x:DataType="viewmodels:HistoryViewModel"
+             Title="��ʷ��¼">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Frame>
+                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                    <Label Grid.Row="0" Grid.Column="0" Text="��ʼ����" VerticalOptions="Center"/>
+                    <DatePicker Grid.Row="0" Grid.Column="1" Date="{Binding FromDate}"/>
+
+                    <Label Grid.Row="0" Grid.Column="2" Text="��������" VerticalOptions="Center"/>
+                    <DatePicker Grid.Row="0" Grid.Column="3" Date="{Binding ToDate}"/>
+
+                    <Label Grid.Row="1" Grid.Column="0" Text="ָ��" VerticalOptions="Center"/>
+                    <Picker Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Metrics}" SelectedItem="{Binding SelectedMetric}" />
+                    <Button Grid.Row="1" Grid.Column="3" Text="��ѯ" Command="{Binding QueryCommand}"/>
+                </Grid>
+            </Frame>
+
+            <Frame>
+                <mcharts:ChartView HeightRequest="200" Chart="{Binding Chart}" />
+            </Frame>
+
+            <Frame>
+                <CollectionView ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid x:DataType="models:SensorData" ColumnDefinitions="*,Auto" Padding="4">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Timestamp, StringFormat='{0:yyyy-MM-dd HH:mm:ss}'}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Temperature, StringFormat='�¶�: {0:F1} ��C'}" FontSize="12"/>
+                                    <Label Text="{Binding Humidity, StringFormat='ʪ��: {0:F1} %'}" FontSize="12"/>
+                                    <Label Text="{Binding Smoke, StringFormat='����: {0:F1}'}" FontSize="12"/>
+                                    <Label Text="{Binding Light, StringFormat='����: {0:F0} lux'}" FontSize="12"/>
+                                    <Label Text="{Binding CO2, StringFormat='CO2: {0:F0} ppm'}" FontSize="12"/>
+                                    <Label Text="{Binding WaterLevel, StringFormat='ˮλ: {0:F0} %'}" FontSize="12"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
