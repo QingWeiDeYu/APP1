@@ -6,20 +6,22 @@
              xmlns:models="clr-namespace:SmartAgri.Models"
              x:Class="SmartAgri.Views.HistoryPage"
              x:DataType="viewmodels:HistoryViewModel"
-             Title="��ʷ��¼">
+             Title="历史记录">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <Frame>
                 <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
-                    <Label Grid.Row="0" Grid.Column="0" Text="��ʼ����" VerticalOptions="Center"/>
+                    <Label Grid.Row="0" Grid.Column="0" Text="开始日期" VerticalOptions="Center"/>
                     <DatePicker Grid.Row="0" Grid.Column="1" Date="{Binding FromDate}"/>
 
-                    <Label Grid.Row="0" Grid.Column="2" Text="��������" VerticalOptions="Center"/>
+                    <Label Grid.Row="0" Grid.Column="2" Text="结束日期" VerticalOptions="Center"/>
                     <DatePicker Grid.Row="0" Grid.Column="3" Date="{Binding ToDate}"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="ָ��" VerticalOptions="Center"/>
-                    <Picker Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Metrics}" SelectedItem="{Binding SelectedMetric}" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="��ѯ" Command="{Binding QueryCommand}"/>
+                    <Label Grid.Row="1" Grid.Column="0" Text="指标" VerticalOptions="Center"/>
+                    <Picker Grid.Row="1" Grid.Column="1"
+                            ItemsSource="{Binding Metrics}"
+                            SelectedItem="{Binding SelectedMetric}" />
+                    <Button Grid.Row="1" Grid.Column="3" Text="查询" Command="{Binding QueryCommand}"/>
                 </Grid>
             </Frame>
 
@@ -34,12 +36,12 @@
                             <Grid x:DataType="models:SensorData" ColumnDefinitions="*,Auto" Padding="4">
                                 <VerticalStackLayout>
                                     <Label Text="{Binding Timestamp, StringFormat='{0:yyyy-MM-dd HH:mm:ss}'}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Temperature, StringFormat='�¶�: {0:F1} ��C'}" FontSize="12"/>
-                                    <Label Text="{Binding Humidity, StringFormat='ʪ��: {0:F1} %'}" FontSize="12"/>
-                                    <Label Text="{Binding Smoke, StringFormat='����: {0:F1}'}" FontSize="12"/>
-                                    <Label Text="{Binding Light, StringFormat='����: {0:F0} lux'}" FontSize="12"/>
+                                    <Label Text="{Binding Temperature, StringFormat='温度: {0:F1} ℃'}" FontSize="12"/>
+                                    <Label Text="{Binding Humidity, StringFormat='湿度: {0:F1} %'}" FontSize="12"/>
+                                    <Label Text="{Binding Smoke, StringFormat='烟雾: {0:F1}'}" FontSize="12"/>
+                                    <Label Text="{Binding Light, StringFormat='光照: {0:F0} lux'}" FontSize="12"/>
                                     <Label Text="{Binding CO2, StringFormat='CO2: {0:F0} ppm'}" FontSize="12"/>
-                                    <Label Text="{Binding WaterLevel, StringFormat='ˮλ: {0:F0} %'}" FontSize="12"/>
+                                    <Label Text="{Binding WaterLevel, StringFormat='水位: {0:F0} %'}" FontSize="12"/>
                                 </VerticalStackLayout>
                             </Grid>
                         </DataTemplate>

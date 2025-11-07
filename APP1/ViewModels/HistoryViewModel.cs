@@ -29,6 +29,7 @@ public partial class HistoryViewModel : ObservableObject
         set => SetProperty(ref _toDate, value);
     }
 
+    // 默认指标：温度
     private string _selectedMetric = "温度";
     public string SelectedMetric
     {
@@ -37,7 +38,6 @@ public partial class HistoryViewModel : ObservableObject
         {
             if (SetProperty(ref _selectedMetric, value))
             {
-                // 原本由生成器调用的 OnSelectedMetricChanged，这里直接在 setter 中处理
                 BuildChart();
             }
         }
@@ -64,9 +64,14 @@ public partial class HistoryViewModel : ObservableObject
     {
         Items.Clear();
 
-        // 查询 [From, To]（UTC）
-        var from = new DateTimeOffset(FromDate.Date, TimeSpan.Zero);
-        var to = new DateTimeOffset(ToDate.Date.AddDays(1).AddTicks(-1), TimeSpan.Zero);
+        // 按“本地自然日”构造起止，再用于比较（避免偏移不匹配）
+        var tz = TimeZoneInfo.Local;
+
+        var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Unspecified);
+        var localEnd = DateTime.SpecifyKind(ToDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Unspecified);
+
+        var from = new DateTimeOffset(localStart, tz.GetUtcOffset(localStart));
+        var to   = new DateTimeOffset(localEnd,   tz.GetUtcOffset(localEnd));
 
         var list = await _db.Connection.Table<SensorData>()
             .Where(s => s.Timestamp >= from && s.Timestamp <= to)
@@ -80,25 +85,44 @@ public partial class HistoryViewModel : ObservableObject
 
     private void BuildChart()
     {
+        // 当没有记录时，清空图表避免 Microcharts 对空序列做 Min/Max 导致异常
+        if (Items.Count == 0)
+        {
+            Chart = null;
+            return;
+        }
+
         Func<SensorData, double> selector = SelectedMetric switch
         {
             "湿度" => s => s.Humidity,
             "烟雾" => s => s.Smoke,
             "光照" => s => s.Light,
-            "CO2" => s => s.CO2,
+            "CO2"  => s => s.CO2,
             "水位" => s => s.WaterLevel,
-            _ => s => s.Temperature
+            _=> s => s.Temperature // 温度
         };
 
-        var entries = Items.Select(s => new Microcharts.ChartEntry((float)selector(s))
+        // 过滤 NaN/Infinity，避免绘制时异常
+        var values = Items
+            .Select(s => (Value: selector(s), Data: s))
+            .Where(x => !double.IsNaN(x.Value) && !double.IsInfinity(x.Value))
+            .ToList();
+
+        if (values.Count == 0)
+        {
+            Chart = null;
+            return;
+        }
+
+        var entries = values.Select(x => new Microcharts.ChartEntry((float)x.Value)
         {
             Color = SKColor.Parse("#3f51b5"),
-            ValueLabel = selector(s).ToString("0.0")
-        });
+            ValueLabel = x.Value.ToString("0.0")
+        }).ToList();
 
         Chart = new LineChart
         {
-            Entries = entries.ToList(),
+            Entries = entries,
             LineMode = LineMode.Straight,
             LineSize = 3,
             PointMode = PointMode.Circle,
