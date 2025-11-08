@@ -79,59 +79,6 @@
         </VerticalStackLayout>
       </Frame>
 
-      <!-- 实时数据显示（上） -->
-      <Frame>
-        <Grid ColumnDefinitions="Auto,Auto,Auto"
-              RowDefinitions="Auto,Auto,Auto"
-              ColumnSpacing="6"
-              RowSpacing="4">
-          <Label Grid.Row="0" Grid.Column="0" Text="🌡️" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="0" Grid.Column="1" Text="温度(°C)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding Temperature, StringFormat='{}{0:F1}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding TempMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding TempMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
-
-          <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="1" Grid.Column="1" Text="湿度(%)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}" >
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding Humidity, StringFormat='{}{0:F1}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding HumMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding HumMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
-
-          <Label Grid.Row="2" Grid.Column="0" Text="🌫️" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="2" Grid.Column="1" Text="烟雾" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding Smoke, StringFormat='{}{0:F1}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding SmokeMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding SmokeMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
-        </Grid>
-      </Frame>
-
       <!-- 实时数据显示（下）：左侧显示与上方一致，右侧放阈值编辑 -->
             <Frame>
                 <!-- 修复：Frame 只能有一个 Content，这里用容器包裹 Grid + Button -->
@@ -162,7 +109,7 @@
             <!-- 湿度 (新增阈值编辑) -->
             <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
             <Label Grid.Row="1" Grid.Column="1" Text="湿度(%)" Style="{StaticResource MetricNameStyle}"/>
-            <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+            <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}" >
               <Label.FormattedText>
                 <FormattedString>
                   <Span Text="{Binding Humidity, StringFormat='{}{0:F1}'}"/>
