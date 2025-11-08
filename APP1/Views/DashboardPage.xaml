@@ -41,6 +41,7 @@
 
   <ScrollView>
     <VerticalStackLayout Spacing="12" Padding="16">
+
       <!-- 连接设置 -->
       <Frame>
         <VerticalStackLayout Spacing="8">
@@ -101,7 +102,7 @@
 
           <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
           <Label Grid.Row="1" Grid.Column="1" Text="湿度(%)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+          <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}" >
             <Label.FormattedText>
               <FormattedString>
                 <Span Text="{Binding Humidity, StringFormat='{}{0:F1}'}"/>
@@ -131,57 +132,135 @@
         </Grid>
       </Frame>
 
-      <!-- 实时数据显示（下） -->
-      <Frame>
-        <Grid ColumnDefinitions="Auto,Auto,Auto"
-              RowDefinitions="Auto,Auto,Auto"
-              ColumnSpacing="6"
-              RowSpacing="4">
-          <Label Grid.Row="0" Grid.Column="0" Text="☀️" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="0" Grid.Column="1" Text="光照(lux)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding Light, StringFormat='{}{0:F0}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding LightMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding LightMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
+      <!-- 实时数据显示（下）：左侧显示与上方一致，右侧放阈值编辑 -->
+            <Frame>
+                <!-- 修复：Frame 只能有一个 Content，这里用容器包裹 Grid + Button -->
+        <VerticalStackLayout Spacing="6">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                ColumnSpacing="6"
+                RowSpacing="4">
+            <!-- 温度 (新增阈值编辑) -->
+            <Label Grid.Row="0" Grid.Column="0" Text="🌡️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="0" Grid.Column="1" Text="温度(°C)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Temperature, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding TempMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding TempMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="0" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMin}" Placeholder="下限"/>
+            <Label Grid.Row="0" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="0" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMax}" Placeholder="上限"/>
 
-          <Label Grid.Row="1" Grid.Column="0" Text="🧪" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="1" Grid.Column="1" Text="CO2(ppm)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding CO2, StringFormat='{}{0:F0}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding CO2Min, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding CO2Max, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
+            <!-- 湿度 (新增阈值编辑) -->
+            <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="1" Grid.Column="1" Text="湿度(%)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Humidity, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding HumMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding HumMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="1" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMin}" Placeholder="下限"/>
+            <Label Grid.Row="1" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="1" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMax}" Placeholder="上限"/>
 
-          <Label Grid.Row="2" Grid.Column="0" Text="💦" Style="{StaticResource IconLabelStyle}"/>
-          <Label Grid.Row="2" Grid.Column="1" Text="水位(%)" Style="{StaticResource MetricNameStyle}"/>
-          <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
-            <Label.FormattedText>
-              <FormattedString>
-                <Span Text="{Binding WaterLevel, StringFormat='{}{0:F0}'}"/>
-                <Span Text=" ("/>
-                <Span Text="{Binding LevelMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text="~" TextColor="#888" FontSize="12"/>
-                <Span Text="{Binding LevelMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
-                <Span Text=")" TextColor="#888" FontSize="12"/>
-              </FormattedString>
-            </Label.FormattedText>
-          </Label>
-        </Grid>
+            <!-- 烟雾 (新增阈值编辑) -->
+            <Label Grid.Row="2" Grid.Column="0" Text="🌫️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="2" Grid.Column="1" Text="烟雾" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Smoke, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding SmokeMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding SmokeMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="2" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMin}" Placeholder="下限"/>
+            <Label Grid.Row="2" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="2" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMax}" Placeholder="上限"/>
+
+            <!-- 光照 -->
+            <Label Grid.Row="3" Grid.Column="0" Text="☀️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="3" Grid.Column="1" Text="光照(lux)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="3" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Light, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding LightMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding LightMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="3" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMin}" Placeholder="下限"/>
+            <Label Grid.Row="3" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="3" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMax}" Placeholder="上限"/>
+
+            <!-- CO2 -->
+            <Label Grid.Row="4" Grid.Column="0" Text="🧪" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="4" Grid.Column="1" Text="CO2(ppm)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="4" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding CO2, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding CO2Min, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding CO2Max, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="4" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Min}" Placeholder="下限"/>
+            <Label Grid.Row="4" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="4" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Max}" Placeholder="上限"/>
+
+            <!-- 水位 -->
+            <Label Grid.Row="5" Grid.Column="0" Text="💦" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="5" Grid.Column="1" Text="水位(%)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="5" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding WaterLevel, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding LevelMin, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text="~" TextColor="#888" FontSize="12"/>
+                  <Span Text="{Binding LevelMax, StringFormat='{}{0:G}'}" TextColor="#888" FontSize="12"/>
+                  <Span Text=")" TextColor="#888" FontSize="12"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="5" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMin}" Placeholder="下限"/>
+            <Label Grid.Row="5" Grid.Column="4" Text="~" VerticalTextAlignment="Center"/>
+            <Entry Grid.Row="5" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMax}" Placeholder="上限"/>
+          </Grid>
+
+          <!-- 保存按钮靠近阈值编辑 -->
+          <Button Margin="0,8,0,0"
+                  Text="保存并下发阈值"
+                  HorizontalOptions="End"
+                  Command="{Binding SaveThresholdsCommand}"/>
+        </VerticalStackLayout>
       </Frame>
 
       <!-- 温度历史曲线示例 -->
@@ -189,51 +268,6 @@
         <VerticalStackLayout>
           <Label Text="温度历史" FontAttributes="Bold"/>
           <mcharts:ChartView HeightRequest="180" Chart="{Binding TempChart}"/>
-        </VerticalStackLayout>
-      </Frame>
-
-      <!-- 阈值设置 -->
-      <Frame>
-        <VerticalStackLayout Spacing="6">
-          <Label Text="阈值设置" FontAttributes="Bold"/>
-          <Grid ColumnDefinitions="Auto,Auto,Auto,Auto"
-                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
-                ColumnSpacing="8"
-                RowSpacing="6">
-            <Label Grid.Row="0" Grid.Column="0" Text="温度"/>
-            <Border Padding="6,4" StrokeShape="RoundRectangle 4" StrokeThickness="0">
-              <Entry Style="{StaticResource CompactEntryStyle}"
-                     Text="{Binding TempMin}" Placeholder="下限"/>
-            </Border>
-            <Label Grid.Row="0" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="0" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMax}" Placeholder="上限"/>
-
-            <Label Grid.Row="1" Grid.Column="0" Text="湿度"/>
-            <Entry Grid.Row="1" Grid.Column="1" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMin}"/>
-            <Label Grid.Row="1" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="1" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMax}"/>
-
-            <Label Grid.Row="2" Grid.Column="0" Text="烟雾"/>
-            <Entry Grid.Row="2" Grid.Column="1" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMin}"/>
-            <Label Grid.Row="2" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="2" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMax}"/>
-
-            <Label Grid.Row="3" Grid.Column="0" Text="光照"/>
-            <Entry Grid.Row="3" Grid.Column="1" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMin}"/>
-            <Label Grid.Row="3" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="3" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMax}"/>
-
-            <Label Grid.Row="4" Grid.Column="0" Text="CO2"/>
-            <Entry Grid.Row="4" Grid.Column="1" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Min}"/>
-            <Label Grid.Row="4" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="4" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Max}"/>
-
-            <Label Grid.Row="5" Grid.Column="0" Text="水位"/>
-            <Entry Grid.Row="5" Grid.Column="1" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMin}"/>
-            <Label Grid.Row="5" Grid.Column="2" Text="~" VerticalTextAlignment="Center"/>
-            <Entry Grid.Row="5" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMax}"/>
-          </Grid>
-          <Button Text="保存并下发阈值" Command="{Binding SaveThresholdsCommand}" Margin="0,4,0,0"/>
         </VerticalStackLayout>
       </Frame>
 
@@ -247,8 +281,7 @@
                 <Grid ColumnDefinitions="Auto,*,Auto" Padding="4">
                   <Label Text="{Binding Name}" FontAttributes="Bold"/>
                   <Label Grid.Column="1" Text="{Binding Mode}"/>
-                  <Button 
-                          Grid.Column="2"
+                  <Button Grid.Column="2"
                           Text="触发"
                           Command="{Binding Source={x:Reference Root}, Path=BindingContext.TriggerRelayCommand}"
                           CommandParameter="{Binding .}"/>

@@ -65,7 +65,7 @@ public partial class DashboardViewModel : ObservableObject
 
         // 启动时恢复上次 Host/Port
         Host = Preferences.Default.Get(PrefHost, "192.168.4.1");
-        Port = Preferences.Default.Get(PrefPort, 9000);
+        Port = Preferences.Default.Get(PrefPort, 5577);
     }
 
     public async Task InitializeAsync()
