@@ -68,28 +68,52 @@ public partial class DashboardViewModel : ObservableObject
     public double Temperature
     {
         get => temperature;
-        set => SetProperty(ref temperature, value);
+        set
+        {
+            if (SetProperty(ref temperature, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double humidity;
     public double Humidity
     {
         get => humidity;
-        set => SetProperty(ref humidity, value);
+        set
+        {
+            if (SetProperty(ref humidity, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double smoke;
     public double Smoke
     {
         get => smoke;
-        set => SetProperty(ref smoke, value);
+        set
+        {
+            if (SetProperty(ref smoke, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double light;
     public double Light
     {
         get => light;
-        set => SetProperty(ref light, value);
+        set
+        {
+            if (SetProperty(ref light, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     // 注意：保持公开属性名为 CO2
@@ -97,14 +121,26 @@ public partial class DashboardViewModel : ObservableObject
     public double CO2
     {
         get => cO2;
-        set => SetProperty(ref cO2, value);
+        set
+        {
+            if (SetProperty(ref cO2, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double waterLevel;
     public double WaterLevel
     {
         get => waterLevel;
-        set => SetProperty(ref waterLevel, value);
+        set
+        {
+            if (SetProperty(ref waterLevel, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     // 阈值编辑绑定
@@ -112,86 +148,201 @@ public partial class DashboardViewModel : ObservableObject
     public double TempMin
     {
         get => tempMin;
-        set => SetProperty(ref tempMin, value);
+        set
+        {
+            if (SetProperty(ref tempMin, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double tempMax;
     public double TempMax
     {
         get => tempMax;
-        set => SetProperty(ref tempMax, value);
+        set
+        {
+            if (SetProperty(ref tempMax, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double humMin;
     public double HumMin
     {
         get => humMin;
-        set => SetProperty(ref humMin, value);
+        set
+        {
+            if (SetProperty(ref humMin, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double humMax;
     public double HumMax
     {
         get => humMax;
-        set => SetProperty(ref humMax, value);
+        set
+        {
+            if (SetProperty(ref humMax, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double smokeMin;
     public double SmokeMin
     {
         get => smokeMin;
-        set => SetProperty(ref smokeMin, value);
+        set
+        {
+            if (SetProperty(ref smokeMin, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double smokeMax;
     public double SmokeMax
     {
         get => smokeMax;
-        set => SetProperty(ref smokeMax, value);
+        set
+        {
+            if (SetProperty(ref smokeMax, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double lightMin;
     public double LightMin
     {
         get => lightMin;
-        set => SetProperty(ref lightMin, value);
+        set
+        {
+            if (SetProperty(ref lightMin, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double lightMax;
     public double LightMax
     {
         get => lightMax;
-        set => SetProperty(ref lightMax, value);
+        set
+        {
+            if (SetProperty(ref lightMax, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double cO2Min;
     public double CO2Min
     {
         get => cO2Min;
-        set => SetProperty(ref cO2Min, value);
+        set
+        {
+            if (SetProperty(ref cO2Min, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double cO2Max;
     public double CO2Max
     {
         get => cO2Max;
-        set => SetProperty(ref cO2Max, value);
+        set
+        {
+            if (SetProperty(ref cO2Max, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double levelMin;
     public double LevelMin
     {
         get => levelMin;
-        set => SetProperty(ref levelMin, value);
+        set
+        {
+            if (SetProperty(ref levelMin, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
 
     private double levelMax;
     public double LevelMax
     {
         get => levelMax;
-        set => SetProperty(ref levelMax, value);
+        set
+        {
+            if (SetProperty(ref levelMax, value))
+            {
+                UpdateIndicatorStates();
+            }
+        }
     }
     // ===== 手写属性结束 =====
+
+    // 新增：每个指标的“是否在阈值内”布尔属性，UI 绑定指示灯
+    private bool isTempOk;
+    public bool IsTempOk
+    {
+        get => isTempOk;
+        set => SetProperty(ref isTempOk, value);
+    }
+
+    private bool isHumOk;
+    public bool IsHumOk
+    {
+        get => isHumOk;
+        set => SetProperty(ref isHumOk, value);
+    }
+
+    private bool isSmokeOk;
+    public bool IsSmokeOk
+    {
+        get => isSmokeOk;
+        set => SetProperty(ref isSmokeOk, value);
+    }
+
+    private bool isLightOk;
+    public bool IsLightOk
+    {
+        get => isLightOk;
+        set => SetProperty(ref isLightOk, value);
+    }
+
+    private bool isCO2Ok;
+    public bool IsCO2Ok
+    {
+        get => isCO2Ok;
+        set => SetProperty(ref isCO2Ok, value);
+    }
+
+    private bool isLevelOk;
+    public bool IsLevelOk
+    {
+        get => isLevelOk;
+        set => SetProperty(ref isLevelOk, value);
+    }
 
     public ObservableCollection<SensorData> Recent { get; } = new();
     public ObservableCollection<RelayButton> Relays { get; } = new();
@@ -223,6 +374,9 @@ public partial class DashboardViewModel : ObservableObject
         // 加载继电器按钮（可在 UI 中增删改）
         var relays = await _db.Connection.Table<RelayButton>().ToListAsync();
         foreach (var r in relays) Relays.Add(r);
+
+        // 初始化指示灯状态（使用当前值与阈值）
+        UpdateIndicatorStates();
     }
 
     private void ApplyThresholdsToVm(Thresholds t)
@@ -402,5 +556,17 @@ public partial class DashboardViewModel : ObservableObject
                 await _wifi.SendRelayScheduleAsync(relay.RelayId, relay.StartHHmm!, relay.EndHHmm!);
             }
         }
+    }
+
+    // 新增：根据当前值与阈值更新所有指示灯状态
+    private void UpdateIndicatorStates()
+    {
+        // 如果上限小于下限，视为不在范围内（或者可以按业务调整）
+        IsTempOk = TempMin <= TempMax && Temperature >= TempMin && Temperature <= TempMax;
+        IsHumOk = HumMin <= HumMax && Humidity >= HumMin && Humidity <= HumMax;
+        IsSmokeOk = SmokeMin <= SmokeMax && Smoke >= SmokeMin && Smoke <= SmokeMax;
+        IsLightOk = LightMin <= LightMax && Light >= LightMin && Light <= LightMax;
+        IsCO2Ok = CO2Min <= CO2Max && CO2 >= CO2Min && CO2 <= CO2Max;
+        IsLevelOk = LevelMin <= LevelMax && WaterLevel >= LevelMin && WaterLevel <= LevelMax;
     }
 }

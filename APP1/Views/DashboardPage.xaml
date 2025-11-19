@@ -116,7 +116,7 @@
       <!-- 实时数据显示 + 阈值编辑 -->
       <Frame Style="{StaticResource CompactFrame}">
         <VerticalStackLayout Spacing="6">
-          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto"
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
                 RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                 ColumnSpacing="6"
                 RowSpacing="4">
@@ -138,6 +138,13 @@
             <Entry Grid.Row="0" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMin}" Placeholder="下限"/>
             <Label Grid.Row="0" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="0" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="0" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsTempOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
 
             <!-- 湿度 -->
             <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
@@ -157,6 +164,13 @@
             <Entry Grid.Row="1" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMin}" Placeholder="下限"/>
             <Label Grid.Row="1" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="1" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="1" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsHumOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
 
             <!-- 烟雾 -->
             <Label Grid.Row="2" Grid.Column="0" Text="🌫️" Style="{StaticResource IconLabelStyle}"/>
@@ -176,6 +190,13 @@
             <Entry Grid.Row="2" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMin}" Placeholder="下限"/>
             <Label Grid.Row="2" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="2" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="2" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsSmokeOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
 
             <!-- 光照 -->
             <Label Grid.Row="3" Grid.Column="0" Text="☀️" Style="{StaticResource IconLabelStyle}"/>
@@ -195,6 +216,13 @@
             <Entry Grid.Row="3" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMin}" Placeholder="下限"/>
             <Label Grid.Row="3" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="3" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="3" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsLightOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
 
             <!-- CO2 -->
             <Label Grid.Row="4" Grid.Column="0" Text="🧪" Style="{StaticResource IconLabelStyle}"/>
@@ -214,6 +242,13 @@
             <Entry Grid.Row="4" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Min}" Placeholder="下限"/>
             <Label Grid.Row="4" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="4" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Max}" Placeholder="上限"/>
+            <BoxView Grid.Row="4" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsCO2Ok}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
 
             <!-- 水位 -->
             <Label Grid.Row="5" Grid.Column="0" Text="💦" Style="{StaticResource IconLabelStyle}"/>
@@ -233,6 +268,13 @@
             <Entry Grid.Row="5" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMin}" Placeholder="下限"/>
             <Label Grid.Row="5" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
             <Entry Grid.Row="5" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="5" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsLevelOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
           </Grid>
 
           <Button Margin="0,6,0,0"
