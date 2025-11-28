@@ -15,6 +15,9 @@ public partial class HistoryViewModel : ObservableObject
 {
     private readonly DatabaseService _db;
 
+    // 默认在界面上显示的记录数
+    private const int DefaultDisplayCount = 10;
+
     private DateTime _fromDate = DateTime.Today.AddDays(-1);
     public DateTime FromDate
     {
@@ -27,6 +30,14 @@ public partial class HistoryViewModel : ObservableObject
     {
         get => _toDate;
         set => SetProperty(ref _toDate, value);
+    }
+
+    // 图表标题（顶部显示日期）
+    private string _chartTitle = string.Empty;
+    public string ChartTitle
+    {
+        get => _chartTitle;
+        set => SetProperty(ref _chartTitle, value);
     }
 
     // 默认指标：温度
@@ -55,6 +66,7 @@ public partial class HistoryViewModel : ObservableObject
         "温度","湿度","烟雾","光照","CO2","水位"
     };
 
+    // 用于绑定的集合（界面默认只填充最近 DefaultDisplayCount 条）
     public ObservableCollection<SensorData> Items { get; } = new();
 
     public HistoryViewModel(DatabaseService db) => _db = db;
@@ -73,11 +85,12 @@ public partial class HistoryViewModel : ObservableObject
 
         var list = await _db.Connection.Table<SensorData>()
             .Where(s => s.Timestamp >= fromUtc && s.Timestamp <= toUtc)
-            // 改为降序：最新记录在前（UI 列表保持最新在前）
+            // 降序：最新记录在前（方便取最新的 DefaultDisplayCount 条）
             .OrderByDescending(s => s.Timestamp)
             .ToListAsync();
 
-        foreach (var s in list) Items.Add(s);
+        // 仅将最新的 DefaultDisplayCount 条加入 Items（界面默认显示不拥挤）
+        foreach (var s in list.Take(DefaultDisplayCount)) Items.Add(s);
 
         BuildChart();
     }
@@ -91,6 +104,7 @@ public partial class HistoryViewModel : ObservableObject
 
         Items.Clear();
         Chart = null;
+        ChartTitle = string.Empty;
     }
 
     private void BuildChart()
@@ -98,6 +112,7 @@ public partial class HistoryViewModel : ObservableObject
         if (Items.Count == 0)
         {
             Chart = null;
+            ChartTitle = string.Empty;
             return;
         }
 
@@ -119,12 +134,20 @@ public partial class HistoryViewModel : ObservableObject
         if (values.Count == 0)
         {
             Chart = null;
+            ChartTitle = string.Empty;
             return;
         }
 
         // Items 在查询时已按时间降序（最新在前）。
         // 为了让图表从早到晚绘制（时间升序），对 values 按时间升序排序生成 entries。
         var valuesForChart = values.OrderBy(x => x.Data.Timestamp).ToList();
+
+        // 设置图表标题为日期（如果跨多日则显示范围）
+        var firstDate = valuesForChart.First().Data.Timestamp.ToLocalTime().Date;
+        var lastDate = valuesForChart.Last().Data.Timestamp.ToLocalTime().Date;
+        ChartTitle = firstDate == lastDate
+            ? firstDate.ToString("yyyy-MM-dd")
+            : $"{firstDate:yyyy-MM-dd} 至 {lastDate:yyyy-MM-dd}";
 
         // 为避免 X 轴标签拥挤：最多显示约 12 个标签（含首尾）
         int count = valuesForChart.Count;
@@ -133,9 +156,9 @@ public partial class HistoryViewModel : ObservableObject
         var entries = valuesForChart
             .Select((x, i) =>
             {
-                // 本地时间的 “MM-dd HH:mm” 作为 X 轴标签
+                // X 轴只显示本地时间（时:分:秒），其它点显示为空以避免拥挤
                 var label = (i == 0 || i == count - 1 || i % step == 0)
-                    ? x.Data.Timestamp.ToLocalTime().ToString("MM-dd HH:mm")
+                    ? x.Data.Timestamp.ToLocalTime().ToString("HH:mm:ss")
                     : string.Empty;
 
                 return new Microcharts.ChartEntry((float)x.Value)

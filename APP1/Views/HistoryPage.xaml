@@ -39,7 +39,14 @@
             </Frame>
 
             <Frame>
-                <mcharts:ChartView HeightRequest="200" Chart="{Binding Chart}" />
+                <VerticalStackLayout Spacing="4" Padding="8">
+                    <!-- 图表顶部显示日期（来自 ViewModel.ChartTitle）-->
+                    <Label Text="{Binding ChartTitle}"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                    <mcharts:ChartView HeightRequest="200" Chart="{Binding Chart}" />
+                </VerticalStackLayout>
             </Frame>
 
             <Frame>
