@@ -64,7 +64,7 @@ public partial class HistoryViewModel : ObservableObject
     {
         Items.Clear();
 
-        // 用户选择的是“本地日期”，将其转换为本地时间的日起止，再统一转为 UTC 做查询
+        // 用户选择的是“本地日期”，将其转换为本地时间的日至止，再统一转为 UTC 做查询
         var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Local);
         var localEndInclusive = DateTime.SpecifyKind(ToDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local);
 
@@ -73,7 +73,7 @@ public partial class HistoryViewModel : ObservableObject
 
         var list = await _db.Connection.Table<SensorData>()
             .Where(s => s.Timestamp >= fromUtc && s.Timestamp <= toUtc)
-            // 改为降序：最新记录在前
+            // 改为降序：最新记录在前（UI 列表保持最新在前）
             .OrderByDescending(s => s.Timestamp)
             .ToListAsync();
 
@@ -122,7 +122,11 @@ public partial class HistoryViewModel : ObservableObject
             return;
         }
 
-        var entries = values.Select(x => new Microcharts.ChartEntry((float)x.Value)
+        // Items 在查询时已按时间降序（最新在前）。
+        // 为了让图表从早到晚绘制（时间升序），对 values 按时间升序排序生成 entries。
+        var valuesForChart = values.OrderBy(x => x.Data.Timestamp).ToList();
+
+        var entries = valuesForChart.Select(x => new Microcharts.ChartEntry((float)x.Value)
         {
             Color = SKColor.Parse("#3f51b5"),
             ValueLabel = x.Value.ToString("0.0")
