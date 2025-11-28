@@ -17,19 +17,28 @@
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <Frame>
-                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+                    <!-- 日期行 -->
                     <Label Grid.Row="0" Grid.Column="0" Text="开始日期" VerticalOptions="Center"/>
                     <DatePicker Grid.Row="0" Grid.Column="1" Date="{Binding FromDate}"/>
 
                     <Label Grid.Row="0" Grid.Column="2" Text="结束日期" VerticalOptions="Center"/>
                     <DatePicker Grid.Row="0" Grid.Column="3" Date="{Binding ToDate}"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="指标" VerticalOptions="Center"/>
-                    <Picker Grid.Row="1" Grid.Column="1"
+                    <!-- 时间行（新增） -->
+                    <Label Grid.Row="1" Grid.Column="0" Text="开始时间" VerticalOptions="Center"/>
+                    <TimePicker Grid.Row="1" Grid.Column="1" Time="{Binding FromTime}"/>
+
+                    <Label Grid.Row="1" Grid.Column="2" Text="结束时间" VerticalOptions="Center"/>
+                    <TimePicker Grid.Row="1" Grid.Column="3" Time="{Binding ToTime}"/>
+
+                    <!-- 指标与按钮行 -->
+                    <Label Grid.Row="2" Grid.Column="0" Text="指标" VerticalOptions="Center"/>
+                    <Picker Grid.Row="2" Grid.Column="1"
                             ItemsSource="{Binding Metrics}"
                             SelectedItem="{Binding SelectedMetric}" />
-                    <Button Grid.Row="1" Grid.Column="2" Text="查询"  Command="{Binding QueryCommand}"/>
-                    <Button Grid.Row="1" Grid.Column="3"
+                    <Button Grid.Row="2" Grid.Column="2" Text="查询"  Command="{Binding QueryCommand}"/>
+                    <Button Grid.Row="2" Grid.Column="3"
                             Text="清除所有历史"
                             Clicked="OnClearAllClicked"
                             WidthRequest="110"
@@ -40,7 +49,7 @@
 
             <Frame>
                 <VerticalStackLayout Spacing="4" Padding="8">
-                    <!-- 图表顶部显示日期（来自 ViewModel.ChartTitle）-->
+                    <!-- 图表顶部显示日期/时间范围（来自 ViewModel.ChartTitle）-->
                     <Label Text="{Binding ChartTitle}"
                            FontAttributes="Bold"
                            HorizontalOptions="Center"

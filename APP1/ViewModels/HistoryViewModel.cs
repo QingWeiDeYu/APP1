@@ -32,7 +32,22 @@ public partial class HistoryViewModel : ObservableObject
         set => SetProperty(ref _toDate, value);
     }
 
-    // 图表标题（顶部显示日期）
+    // 新增：时间选择（默认从 00:00 到 23:59:59）
+    private TimeSpan _fromTime = TimeSpan.Zero;
+    public TimeSpan FromTime
+    {
+        get => _fromTime;
+        set => SetProperty(ref _fromTime, value);
+    }
+
+    private TimeSpan _toTime = new TimeSpan(23, 59, 59);
+    public TimeSpan ToTime
+    {
+        get => _toTime;
+        set => SetProperty(ref _toTime, value);
+    }
+
+    // 图表标题（顶部显示日期/时间范围）
     private string _chartTitle = string.Empty;
     public string ChartTitle
     {
@@ -76,9 +91,17 @@ public partial class HistoryViewModel : ObservableObject
     {
         Items.Clear();
 
-        // 用户选择的是“本地日期”，将其转换为本地时间的日至止，再统一转为 UTC 做查询
-        var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Local);
-        var localEndInclusive = DateTime.SpecifyKind(ToDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local);
+        // 将用户选择的本地日期与时间组合，然后统一转为 UTC 做查询
+        var localStart = DateTime.SpecifyKind(FromDate.Date + FromTime, DateTimeKind.Local);
+        var localEndInclusive = DateTime.SpecifyKind(ToDate.Date + ToTime, DateTimeKind.Local);
+
+        // 如果结束时间早于开始时间（用户误选），交换或将结束设为开始
+        if (localEndInclusive < localStart)
+        {
+            var tmp = localEndInclusive;
+            localEndInclusive = localStart;
+            localStart = tmp;
+        }
 
         var fromUtc = new DateTimeOffset(localStart).ToUniversalTime();
         var toUtc   = new DateTimeOffset(localEndInclusive).ToUniversalTime();
@@ -142,12 +165,21 @@ public partial class HistoryViewModel : ObservableObject
         // 为了让图表从早到晚绘制（时间升序），对 values 按时间升序排序生成 entries。
         var valuesForChart = values.OrderBy(x => x.Data.Timestamp).ToList();
 
-        // 设置图表标题为日期（如果跨多日则显示范围）
-        var firstDate = valuesForChart.First().Data.Timestamp.ToLocalTime().Date;
-        var lastDate = valuesForChart.Last().Data.Timestamp.ToLocalTime().Date;
-        ChartTitle = firstDate == lastDate
-            ? firstDate.ToString("yyyy-MM-dd")
-            : $"{firstDate:yyyy-MM-dd} 至 {lastDate:yyyy-MM-dd}";
+        // 设置图表标题为日期/时间范围（更细粒度：如果在同一天显示时间区间）
+        var firstTs = valuesForChart.First().Data.Timestamp.ToLocalTime();
+        var lastTs = valuesForChart.Last().Data.Timestamp.ToLocalTime();
+        if (firstTs.Date == lastTs.Date)
+        {
+            // 同一天：显示日期 + 时间范围（若为整天可只显示日期）
+            bool isFullDay = firstTs.TimeOfDay == TimeSpan.Zero && lastTs.TimeOfDay.TotalSeconds >= 86399;
+            ChartTitle = isFullDay
+                ? firstTs.ToString("yyyy-MM-dd")
+                : $"{firstTs:yyyy-MM-dd} {firstTs:HH:mm:ss} - {lastTs:HH:mm:ss}";
+        }
+        else
+        {
+            ChartTitle = $"{firstTs:yyyy-MM-dd HH:mm:ss} 至 {lastTs:yyyy-MM-dd HH:mm:ss}";
+        }
 
         // 为避免 X 轴标签拥挤：最多显示约 12 个标签（含首尾）
         int count = valuesForChart.Count;
