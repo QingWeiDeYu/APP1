@@ -73,7 +73,8 @@ public partial class HistoryViewModel : ObservableObject
 
         var list = await _db.Connection.Table<SensorData>()
             .Where(s => s.Timestamp >= fromUtc && s.Timestamp <= toUtc)
-            .OrderBy(s => s.Timestamp)
+            // 改为降序：最新记录在前
+            .OrderByDescending(s => s.Timestamp)
             .ToListAsync();
 
         foreach (var s in list) Items.Add(s);
