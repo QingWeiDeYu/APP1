@@ -21,7 +21,14 @@
                     <Picker Grid.Row="1" Grid.Column="1"
                             ItemsSource="{Binding Metrics}"
                             SelectedItem="{Binding SelectedMetric}" />
-                    <Button Grid.Row="1" Grid.Column="3" Text="查询" Command="{Binding QueryCommand}"/>
+                    <Button Grid.Row="1" Grid.Column="2" Text="查询"  Command="{Binding QueryCommand}"/>
+                    <!-- 改为用 Clicked 在 code-behind 弹确认框  TextColor="Red"-->
+                    <Button Grid.Row="1" Grid.Column="3"
+                            Text="清除所有历史"                         
+                            Clicked="OnClearAllClicked"
+                            WidthRequest="110"
+                            HorizontalOptions="Start"
+                            Margin="4,0"/>
                 </Grid>
             </Frame>
 

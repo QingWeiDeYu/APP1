@@ -64,7 +64,6 @@ public partial class HistoryViewModel : ObservableObject
     {
         Items.Clear();
 
-        // 按“本地自然日”构造起止，再用于比较（避免偏移不匹配）
         var tz = TimeZoneInfo.Local;
 
         var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Unspecified);
@@ -83,9 +82,19 @@ public partial class HistoryViewModel : ObservableObject
         BuildChart();
     }
 
+    // 新增命令：清除所有历史（仅删除 SensorData 表）
+    [RelayCommand]
+    public async Task ClearAllHistoryAsync()
+    {
+        await _db.Connection.DeleteAllAsync<SensorData>();
+        try { await _db.Connection.ExecuteAsync("VACUUM"); } catch { /* 部分平台可能不支持 */ }
+
+        Items.Clear();
+        Chart = null;
+    }
+
     private void BuildChart()
     {
-        // 当没有记录时，清空图表避免 Microcharts 对空序列做 Min/Max 导致异常
         if (Items.Count == 0)
         {
             Chart = null;
@@ -99,10 +108,9 @@ public partial class HistoryViewModel : ObservableObject
             "光照" => s => s.Light,
             "CO2"  => s => s.CO2,
             "水位" => s => s.WaterLevel,
-            _=> s => s.Temperature // 温度
+            _=> s => s.Temperature
         };
 
-        // 过滤 NaN/Infinity，避免绘制时异常
         var values = Items
             .Select(s => (Value: selector(s), Data: s))
             .Where(x => !double.IsNaN(x.Value) && !double.IsInfinity(x.Value))
