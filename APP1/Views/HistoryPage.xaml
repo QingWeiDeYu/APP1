@@ -4,9 +4,16 @@
              xmlns:mcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
              xmlns:viewmodels="clr-namespace:SmartAgri.ViewModels"
              xmlns:models="clr-namespace:SmartAgri.Models"
+             xmlns:conv="clr-namespace:SmartAgri.Converters"
              x:Class="SmartAgri.Views.HistoryPage"
              x:DataType="viewmodels:HistoryViewModel"
              Title="历史记录">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:DateTimeOffsetToLocalStringConverter x:Key="DtoToLocalConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <Frame>
@@ -22,9 +29,8 @@
                             ItemsSource="{Binding Metrics}"
                             SelectedItem="{Binding SelectedMetric}" />
                     <Button Grid.Row="1" Grid.Column="2" Text="查询"  Command="{Binding QueryCommand}"/>
-                    <!-- 改为用 Clicked 在 code-behind 弹确认框  TextColor="Red"-->
                     <Button Grid.Row="1" Grid.Column="3"
-                            Text="清除所有历史"                         
+                            Text="清除所有历史"
                             Clicked="OnClearAllClicked"
                             WidthRequest="110"
                             HorizontalOptions="Start"
@@ -42,7 +48,8 @@
                         <DataTemplate>
                             <Grid x:DataType="models:SensorData" ColumnDefinitions="*,Auto" Padding="4">
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding Timestamp, StringFormat='{0:yyyy-MM-dd HH:mm:ss}'}" FontAttributes="Bold"/>
+                                    <!-- 使用转换器把 UTC 的 DateTimeOffset 转为本地字符串 -->
+                                    <Label Text="{Binding Timestamp, Converter={StaticResource DtoToLocalConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" FontAttributes="Bold"/>
                                     <Label Text="{Binding Temperature, StringFormat='温度: {0:F1} ℃'}" FontSize="12"/>
                                     <Label Text="{Binding Humidity, StringFormat='湿度: {0:F1} %'}" FontSize="12"/>
                                     <Label Text="{Binding Smoke, StringFormat='烟雾: {0:F1}'}" FontSize="12"/>

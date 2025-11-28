@@ -64,16 +64,15 @@ public partial class HistoryViewModel : ObservableObject
     {
         Items.Clear();
 
-        var tz = TimeZoneInfo.Local;
+        // 用户选择的是“本地日期”，将其转换为本地时间的日起止，再统一转为 UTC 做查询
+        var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Local);
+        var localEndInclusive = DateTime.SpecifyKind(ToDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Local);
 
-        var localStart = DateTime.SpecifyKind(FromDate.Date, DateTimeKind.Unspecified);
-        var localEnd = DateTime.SpecifyKind(ToDate.Date.AddDays(1).AddTicks(-1), DateTimeKind.Unspecified);
-
-        var from = new DateTimeOffset(localStart, tz.GetUtcOffset(localStart));
-        var to   = new DateTimeOffset(localEnd,   tz.GetUtcOffset(localEnd));
+        var fromUtc = new DateTimeOffset(localStart).ToUniversalTime();
+        var toUtc   = new DateTimeOffset(localEndInclusive).ToUniversalTime();
 
         var list = await _db.Connection.Table<SensorData>()
-            .Where(s => s.Timestamp >= from && s.Timestamp <= to)
+            .Where(s => s.Timestamp >= fromUtc && s.Timestamp <= toUtc)
             .OrderBy(s => s.Timestamp)
             .ToListAsync();
 
