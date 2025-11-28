@@ -81,7 +81,7 @@ public partial class HistoryViewModel : ObservableObject
         "温度","湿度","烟雾","光照","CO2","水位"
     };
 
-    // 用于绑定的集合（界面默认只填充最近 DefaultDisplayCount 条）
+    // 用于绑定的集合（现在显示所有匹配的记录）
     public ObservableCollection<SensorData> Items { get; } = new();
 
     public HistoryViewModel(DatabaseService db) => _db = db;
@@ -108,12 +108,12 @@ public partial class HistoryViewModel : ObservableObject
 
         var list = await _db.Connection.Table<SensorData>()
             .Where(s => s.Timestamp >= fromUtc && s.Timestamp <= toUtc)
-            // 降序：最新记录在前（方便取最新的 DefaultDisplayCount 条）
+            // 降序：最新记录在前
             .OrderByDescending(s => s.Timestamp)
             .ToListAsync();
 
-        // 仅将最新的 DefaultDisplayCount 条加入 Items（界面默认显示不拥挤）
-        foreach (var s in list.Take(DefaultDisplayCount)) Items.Add(s);
+        // 取消原有的只显示最新 10 条限制 —— 现在将所有匹配记录加入 Items
+        foreach (var s in list) Items.Add(s);
 
         BuildChart();
     }
