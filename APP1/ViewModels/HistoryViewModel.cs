@@ -126,11 +126,26 @@ public partial class HistoryViewModel : ObservableObject
         // 为了让图表从早到晚绘制（时间升序），对 values 按时间升序排序生成 entries。
         var valuesForChart = values.OrderBy(x => x.Data.Timestamp).ToList();
 
-        var entries = valuesForChart.Select(x => new Microcharts.ChartEntry((float)x.Value)
-        {
-            Color = SKColor.Parse("#3f51b5"),
-            ValueLabel = x.Value.ToString("0.0")
-        }).ToList();
+        // 为避免 X 轴标签拥挤：最多显示约 12 个标签（含首尾）
+        int count = valuesForChart.Count;
+        int step = count > 12 ? (int)Math.Ceiling(count / 12.0) : 1;
+
+        var entries = valuesForChart
+            .Select((x, i) =>
+            {
+                // 本地时间的 “MM-dd HH:mm” 作为 X 轴标签
+                var label = (i == 0 || i == count - 1 || i % step == 0)
+                    ? x.Data.Timestamp.ToLocalTime().ToString("MM-dd HH:mm")
+                    : string.Empty;
+
+                return new Microcharts.ChartEntry((float)x.Value)
+                {
+                    Color = SKColor.Parse("#3f51b5"),
+                    ValueLabel = x.Value.ToString("0.0"),
+                    Label = label
+                };
+            })
+            .ToList();
 
         Chart = new LineChart
         {
@@ -138,7 +153,15 @@ public partial class HistoryViewModel : ObservableObject
             LineMode = LineMode.Straight,
             LineSize = 3,
             PointMode = PointMode.Circle,
-            PointSize = 3
+            PointSize = 3,
+
+            // 数值与标签均横向显示
+            LabelOrientation = Orientation.Horizontal,
+            ValueLabelOrientation = Orientation.Horizontal,
+
+            // 可根据需要微调文字大小
+            LabelTextSize = 18,
+            ValueLabelTextSize = 18
         };
     }
 }
