@@ -27,10 +27,12 @@
 
                     <!-- 时间行（新增） -->
                     <Label Grid.Row="1" Grid.Column="0" Text="开始时间" VerticalOptions="Center"/>
-                    <TimePicker Grid.Row="1" Grid.Column="1" Time="{Binding FromTime}"/>
+                    <!-- 24 小时制显示 -->
+                    <TimePicker Grid.Row="1" Grid.Column="1" Time="{Binding FromTime}" Format="HH:mm"/>
 
                     <Label Grid.Row="1" Grid.Column="2" Text="结束时间" VerticalOptions="Center"/>
-                    <TimePicker Grid.Row="1" Grid.Column="3" Time="{Binding ToTime}"/>
+                    <!-- 24 小时制显示 -->
+                    <TimePicker Grid.Row="1" Grid.Column="3" Time="{Binding ToTime}" Format="HH:mm"/>
 
                     <!-- 指标与按钮行 -->
                     <Label Grid.Row="2" Grid.Column="0" Text="指标" VerticalOptions="Center"/>
