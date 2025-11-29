@@ -181,17 +181,50 @@ public partial class HistoryViewModel : ObservableObject
             ChartTitle = $"{firstTs:yyyy-MM-dd HH:mm:ss} 至 {lastTs:yyyy-MM-dd HH:mm:ss}";
         }
 
-        // 为避免 X 轴标签拥挤：最多显示约 12 个标签（含首尾）
         int count = valuesForChart.Count;
-        int step = count > 12 ? (int)Math.Ceiling(count / 12.0) : 1;
+
+        // 固定时间点：开始 / 时间中点 / 结束（文本内容固定，不随数据量增减改变）
+        var targetStart = valuesForChart.First().Data.Timestamp;
+        var targetEnd = valuesForChart.Last().Data.Timestamp;
+        var targetMid = targetStart + TimeSpan.FromTicks((targetEnd - targetStart).Ticks / 2);
+
+        // 找到在当前数据中最接近这三个固定时间的索引（用于确定标签显示在图上哪个数据点位置）
+        int FindNearestIndex(DateTimeOffset t)
+        {
+            long bestDiff = long.MaxValue;
+            int bestIdx = 0;
+            for (int i = 0; i < count; i++)
+            {
+                var diff = Math.Abs((valuesForChart[i].Data.Timestamp - t).Ticks);
+                if (diff < bestDiff)
+                {
+                    bestDiff = diff;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
+        }
+
+        int idxStart = FindNearestIndex(targetStart);
+        int idxMid = FindNearestIndex(targetMid);
+        int idxEnd = FindNearestIndex(targetEnd);
+
+        // 确保 idxStart <= idxMid <= idxEnd（如果存在交叉则调整）
+        if (idxStart > idxMid) idxMid = idxStart;
+        if (idxMid > idxEnd) idxMid = idxEnd;
+
+        // 文本显示使用固定的目标时间（固定格式），不随 nearest point 的实际时间变化
+        var labelStartText = targetStart.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        var labelMidText = targetMid.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        var labelEndText = targetEnd.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
 
         var entries = valuesForChart
             .Select((x, i) =>
             {
-                // X 轴只显示本地时间（时:分:秒），其它点显示为空以避免拥挤
-                var label = (i == 0 || i == count - 1 || i % step == 0)
-                    ? x.Data.Timestamp.ToLocalTime().ToString("HH:mm:ss")
-                    : string.Empty;
+                string label = string.Empty;
+                if (i == idxStart) label = labelStartText;
+                else if (i == idxMid) label = labelMidText;
+                else if (i == idxEnd) label = labelEndText;
 
                 return new Microcharts.ChartEntry((float)x.Value)
                 {
