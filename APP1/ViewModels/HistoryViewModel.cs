@@ -55,6 +55,28 @@ public partial class HistoryViewModel : ObservableObject
         set => SetProperty(ref _chartTitle, value);
     }
 
+    // 新增：图表下方固定显示的三个时间标签（开始 / 中点 / 结束）
+    private string _startLabel = string.Empty;
+    public string StartLabel
+    {
+        get => _startLabel;
+        set => SetProperty(ref _startLabel, value);
+    }
+
+    private string _midLabel = string.Empty;
+    public string MidLabel
+    {
+        get => _midLabel;
+        set => SetProperty(ref _midLabel, value);
+    }
+
+    private string _endLabel = string.Empty;
+    public string EndLabel
+    {
+        get => _endLabel;
+        set => SetProperty(ref _endLabel, value);
+    }
+
     // 默认指标：温度
     private string _selectedMetric = "温度";
     public string SelectedMetric
@@ -128,6 +150,9 @@ public partial class HistoryViewModel : ObservableObject
         Items.Clear();
         Chart = null;
         ChartTitle = string.Empty;
+
+        // 清空下方固定标签
+        StartLabel = MidLabel = EndLabel = string.Empty;
     }
 
     private void BuildChart()
@@ -136,6 +161,9 @@ public partial class HistoryViewModel : ObservableObject
         {
             Chart = null;
             ChartTitle = string.Empty;
+
+            // 清空下方固定标签
+            StartLabel = MidLabel = EndLabel = string.Empty;
             return;
         }
 
@@ -158,6 +186,9 @@ public partial class HistoryViewModel : ObservableObject
         {
             Chart = null;
             ChartTitle = string.Empty;
+
+            // 清空下方固定标签
+            StartLabel = MidLabel = EndLabel = string.Empty;
             return;
         }
 
@@ -218,19 +249,21 @@ public partial class HistoryViewModel : ObservableObject
         var labelMidText = targetMid.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
         var labelEndText = targetEnd.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
 
+        // 将固定文本绑定到外部标签（XAML 中的三个 Label）
+        StartLabel = labelStartText;
+        MidLabel = labelMidText;
+        EndLabel = labelEndText;
+
+        // 为避免 Microcharts 在点下方绘制过长标签导致折叠，我们这里不在 Entry.Label 输出完整时间（保持空）。
+        // 只在特定需要时显示 ValueLabel（示例保留一位小数）
         var entries = valuesForChart
             .Select((x, i) =>
             {
-                string label = string.Empty;
-                if (i == idxStart) label = labelStartText;
-                else if (i == idxMid) label = labelMidText;
-                else if (i == idxEnd) label = labelEndText;
-
                 return new Microcharts.ChartEntry((float)x.Value)
                 {
                     Color = SKColor.Parse("#3f51b5"),
                     ValueLabel = x.Value.ToString("0.0"),
-                    Label = label
+                    Label = string.Empty
                 };
             })
             .ToList();
@@ -243,13 +276,13 @@ public partial class HistoryViewModel : ObservableObject
             PointMode = PointMode.Circle,
             PointSize = 3,
 
-            // 数值与标签均横向显示
+            // 数值与标签均横向显示（此处 Entry.Label 为空，外部固定标签显示时间）
             LabelOrientation = Orientation.Horizontal,
             ValueLabelOrientation = Orientation.Horizontal,
 
             // 可根据需要微调文字大小
-            LabelTextSize = 18,
-            ValueLabelTextSize = 18
+            LabelTextSize = 14,
+            ValueLabelTextSize = 12
         };
     }
 }

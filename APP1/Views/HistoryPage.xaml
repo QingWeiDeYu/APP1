@@ -57,6 +57,28 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
                     <mcharts:ChartView HeightRequest="200" Chart="{Binding Chart}" />
+
+                    <!-- 新增：固定的三个时间标签（左中右），放在图表下方，避免随数据折叠 -->
+                    <Grid ColumnDefinitions="*,*,*" Margin="0,6,0,0">
+                        <Label Grid.Column="0"
+                               Text="{Binding StartLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="Start"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="{Binding MidLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="2"
+                               Text="{Binding EndLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="End"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                    </Grid>
                 </VerticalStackLayout>
             </Frame>
 
