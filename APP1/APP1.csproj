@@ -11,6 +11,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
+
+	<!-- 安装包格式 -->
+	<AndroidPackageFormat>apk</AndroidPackageFormat>
+
     <!-- Display name   MauiApp1-->
     <ApplicationTitle>智慧环境检测</ApplicationTitle>
 
@@ -31,15 +35,23 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
   </PropertyGroup>
 
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
+	    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+	    <PackageCertificateThumbprint>9132F96FB01B1C88D3EC3D929D1ED967FB7BB46B</PackageCertificateThumbprint>
+    </PropertyGroup>
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(RuntimeIdentifierOverride)' != ''">
+	    <RuntimeIdentifier>$(RuntimeIdentifierOverride)</RuntimeIdentifier>
+    </PropertyGroup>
+	  
+	  
+	
   <PropertyGroup>
     <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- App Icon  ForegroundFile="Resources\AppIcon\appiconfg.svg" -->
-    <MauiIcon Include="Resources\AppIcon\appicon.png" 
-			  
-			  Color="#512BD4" />
+    <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#512BD4" />
 
     <!-- Splash Screen svg-->
     <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#512BD4" BaseSize="128,128" />
