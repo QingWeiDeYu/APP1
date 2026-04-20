@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Shell
+    x:Class="SmartAgri.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:SmartAgri.Views">
+
+  <!-- 这里声明应用的页面与路由，供导航使用（//LoginPage、//DashboardPage 等） -->
+  <FlyoutItem Title="登录" Route="LoginPage">
+    <ShellContent Title="登录" ContentTemplate="{DataTemplate views:LoginPage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="仪表盘" Route="DashboardPage">
+    <ShellContent Title="仪表盘" ContentTemplate="{DataTemplate views:DashboardPage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="用户管理" Route="UsersPage">
+    <ShellContent Title="用户管理" ContentTemplate="{DataTemplate views:UsersPage}" />
+  </FlyoutItem>
+
+  <FlyoutItem Title="历史记录" Route="HistoryPage">
+    <ShellContent Title="历史记录" ContentTemplate="{DataTemplate views:HistoryPage}" />
+  </FlyoutItem>
+
+</Shell>

@@ -1,0 +1,322 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:conv="clr-namespace:SmartAgri.Converters"
+             xmlns:viewmodels="clr-namespace:SmartAgri.ViewModels"
+             xmlns:models="clr-namespace:SmartAgri.Models"
+             xmlns:views="clr-namespace:SmartAgri.Views"
+             x:Class="SmartAgri.Views.DashboardPage"
+             x:Name="Root"
+             x:DataType="viewmodels:DashboardViewModel"
+             Title="智慧农业 - 仪表盘">
+  <ContentPage.Resources>
+    <ResourceDictionary>
+      <conv:BoolToTextConverter x:Key="BoolToText" />
+      <Style x:Key="IconLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+      </Style>
+      <Style x:Key="MetricNameStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0,0,4,0"/>
+        <Setter Property="TextColor" Value="#444"/>
+      </Style>
+      <Style x:Key="MetricValueStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="HorizontalTextAlignment" Value="Start"/>
+      </Style>
+      <Style x:Key="CompactEntryStyle" TargetType="Entry">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="HeightRequest" Value="28"/>
+        <Setter Property="WidthRequest" Value="72"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="HorizontalOptions" Value="Start"/>
+        <Setter Property="VerticalTextAlignment" Value="Center"/>
+        <Setter Property="Keyboard" Value="Numeric"/>
+        <Setter Property="BackgroundColor" Value="#F6F6F6"/>
+      </Style>
+      <Style x:Key="CompactFrame" TargetType="Frame">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="HasShadow" Value="False"/>
+        <Setter Property="BackgroundColor" Value="#FFFFFF"/>
+      </Style>
+      <Style x:Key="SectionTitle" TargetType="Label">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="TextColor" Value="#222"/>
+      </Style>
+      <Style x:Key="ActionButton" TargetType="Button">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HeightRequest" Value="30"/>
+        <Setter Property="Padding" Value="8,2"/>
+      </Style>
+    </ResourceDictionary>
+  </ContentPage.Resources>
+
+  <ScrollView>
+    <VerticalStackLayout Spacing="8" Padding="12">
+
+      <!-- 连接设置 -->
+      <Frame Style="{StaticResource CompactFrame}">
+        <VerticalStackLayout Spacing="6">
+          <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+            <Label Text="WIFI 连接" Style="{StaticResource SectionTitle}"/>
+            <BoxView WidthRequest="10"
+                     HeightRequest="10"
+                     CornerRadius="5"
+                     Color="#E53935">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsConnected}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+            <Label Text="{Binding IsConnected, Converter={StaticResource BoolToText}, ConverterParameter='已连|未连'}"
+                   FontSize="11"
+                   TextColor="#666"
+                   VerticalTextAlignment="Center"/>
+          </HorizontalStackLayout>
+
+          <!-- 注意：把第一列改为 Auto，并为 Host Entry 设置固定宽度，避免过长 -->
+          <Grid ColumnDefinitions="Auto,Auto,Auto,Auto"
+                RowDefinitions="Auto"
+                ColumnSpacing="6">
+            <Entry Grid.Column="0"
+                   WidthRequest="160"
+                   Placeholder="主机 IP"
+                   Text="{Binding Host}"
+                   FontSize="12"
+                   HorizontalOptions="Start"/>
+            <Entry Grid.Column="1"
+                   WidthRequest="64"
+                   Placeholder="端口"
+                   Keyboard="Numeric"
+                   Text="{Binding Port}"
+                   FontSize="12"/>
+            <Button Grid.Column="2"
+                    Text="{Binding IsConnected, Converter={StaticResource BoolToText}, ConverterParameter='已连|连接'}"
+                    Command="{Binding ConnectCommand}"
+                    Style="{StaticResource ActionButton}"/>
+            <Button Grid.Column="3"
+                    Text="断开"
+                    Margin="6,0,0,0"
+                    Command="{Binding DisconnectCommand}"
+                    Style="{StaticResource ActionButton}"/>
+          </Grid>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!-- 实时数据显示 + 阈值编辑 -->
+      <Frame Style="{StaticResource CompactFrame}">
+        <VerticalStackLayout Spacing="6">
+          <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                ColumnSpacing="6"
+                RowSpacing="4">
+            <!-- 温度 -->
+            <Label Grid.Row="0" Grid.Column="0" Text="🌡️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="0" Grid.Column="1" Text="温度(°C)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="0" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Temperature, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding TempMin, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding TempMax, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="0" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMin}" Placeholder="下限"/>
+            <Label Grid.Row="0" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="0" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding TempMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="0" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsTempOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+
+            <!-- 湿度 -->
+            <Label Grid.Row="1" Grid.Column="0" Text="💧" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="1" Grid.Column="1" Text="湿度(%)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="1" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Humidity, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding HumMin, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding HumMax, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="1" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMin}" Placeholder="下限"/>
+            <Label Grid.Row="1" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="1" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding HumMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="1" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsHumOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+
+            <!-- 烟雾 -->
+            <Label Grid.Row="2" Grid.Column="0" Text="🌫️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="2" Grid.Column="1" Text="烟雾" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="2" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Smoke, StringFormat='{}{0:F1}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding SmokeMin, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding SmokeMax, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="2" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMin}" Placeholder="下限"/>
+            <Label Grid.Row="2" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="2" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding SmokeMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="2" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsSmokeOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+
+            <!-- 光照 -->
+            <Label Grid.Row="3" Grid.Column="0" Text="☀️" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="3" Grid.Column="1" Text="光照(lux)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="3" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding Light, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding LightMin, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding LightMax, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="3" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMin}" Placeholder="下限"/>
+            <Label Grid.Row="3" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="3" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LightMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="3" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsLightOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+
+            <!-- CO2 -->
+            <Label Grid.Row="4" Grid.Column="0" Text="🧪" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="4" Grid.Column="1" Text="CO2(ppm)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="4" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding CO2, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding CO2Min, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding CO2Max, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="4" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Min}" Placeholder="下限"/>
+            <Label Grid.Row="4" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="4" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding CO2Max}" Placeholder="上限"/>
+            <BoxView Grid.Row="4" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsCO2Ok}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+
+            <!-- 水位 -->
+            <Label Grid.Row="5" Grid.Column="0" Text="💦" Style="{StaticResource IconLabelStyle}"/>
+            <Label Grid.Row="5" Grid.Column="1" Text="水位(%)" Style="{StaticResource MetricNameStyle}"/>
+            <Label Grid.Row="5" Grid.Column="2" Style="{StaticResource MetricValueStyle}">
+              <Label.FormattedText>
+                <FormattedString>
+                  <Span Text="{Binding WaterLevel, StringFormat='{}{0:F0}'}"/>
+                  <Span Text=" ("/>
+                  <Span Text="{Binding LevelMin, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text="~" TextColor="#888" FontSize="11"/>
+                  <Span Text="{Binding LevelMax, StringFormat='{}{0:F1}'}" TextColor="#888" FontSize="11"/>
+                  <Span Text=")" TextColor="#888" FontSize="11"/>
+                </FormattedString>
+              </Label.FormattedText>
+            </Label>
+            <Entry Grid.Row="5" Grid.Column="3" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMin}" Placeholder="下限"/>
+            <Label Grid.Row="5" Grid.Column="4" Text="~" VerticalTextAlignment="Center" FontSize="12"/>
+            <Entry Grid.Row="5" Grid.Column="5" Style="{StaticResource CompactEntryStyle}" Text="{Binding LevelMax}" Placeholder="上限"/>
+            <BoxView Grid.Row="5" Grid.Column="6" WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#E53935" HorizontalOptions="Center" VerticalOptions="Center">
+              <BoxView.Triggers>
+                <DataTrigger TargetType="BoxView" Binding="{Binding IsLevelOk}" Value="True">
+                  <Setter Property="Color" Value="LimeGreen"/>
+                </DataTrigger>
+              </BoxView.Triggers>
+            </BoxView>
+          </Grid>
+
+          <Button Margin="0,6,0,0"
+                  Text="保存并下发阈值"
+                  HorizontalOptions="End"
+                  Command="{Binding SaveThresholdsCommand}"
+                  Style="{StaticResource ActionButton}"/>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!-- 温度历史曲线 -->
+      <Frame Style="{StaticResource CompactFrame}">
+        <VerticalStackLayout Spacing="6">
+          <Label Text="温度历史" Style="{StaticResource SectionTitle}"/>
+          <mcharts:ChartView HeightRequest="140" Chart="{Binding TempChart}"/>
+        </VerticalStackLayout>
+      </Frame>
+
+      <!-- 继电器（紧凑列表） -->
+      <Frame Style="{StaticResource CompactFrame}">
+        <VerticalStackLayout Spacing="6">
+          <Label Text="继电器" Style="{StaticResource SectionTitle}"/>
+          <CollectionView ItemsSource="{Binding Relays}" SelectionMode="None" HeightRequest="120">
+            <CollectionView.ItemTemplate>
+              <DataTemplate x:DataType="models:RelayButton">
+                <Grid ColumnDefinitions="*,Auto" Padding="6">
+                  <VerticalStackLayout Spacing="2">
+                    <Label Text="{Binding Name}" FontSize="13" FontAttributes="Bold"/>
+                    <Label Text="{Binding Mode}" FontSize="12" TextColor="#666"/>
+                  </VerticalStackLayout>
+                  <Button Grid.Column="1"
+                          Text="触发"
+                          Command="{Binding Source={x:Reference Root}, Path=BindingContext.TriggerRelayCommand}"
+                          CommandParameter="{Binding .}"
+                          Style="{StaticResource ActionButton}"/>
+                </Grid>
+              </DataTemplate>
+            </CollectionView.ItemTemplate>
+          </CollectionView>
+        </VerticalStackLayout>
+      </Frame>
+
+    </VerticalStackLayout>
+  </ScrollView>
+</ContentPage>

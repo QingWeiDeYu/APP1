@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:viewmodels="clr-namespace:SmartAgri.ViewModels"
+             xmlns:models="clr-namespace:SmartAgri.Models"
+             xmlns:conv="clr-namespace:SmartAgri.Converters"
+             x:Class="SmartAgri.Views.HistoryPage"
+             x:DataType="viewmodels:HistoryViewModel"
+             Title="历史记录">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:DateTimeOffsetToLocalStringConverter x:Key="DtoToLocalConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Frame>
+                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+                    <!-- 日期行 -->
+                    <Label Grid.Row="0" Grid.Column="0" Text="开始日期" VerticalOptions="Center"/>
+                    <DatePicker Grid.Row="0" Grid.Column="1" Date="{Binding FromDate}"/>
+
+                    <Label Grid.Row="0" Grid.Column="2" Text="结束日期" VerticalOptions="Center"/>
+                    <DatePicker Grid.Row="0" Grid.Column="3" Date="{Binding ToDate}"/>
+
+                    <!-- 时间行（新增） -->
+                    <Label Grid.Row="1" Grid.Column="0" Text="开始时间" VerticalOptions="Center"/>
+                    <!-- 24 小时制显示 -->
+                    <TimePicker Grid.Row="1" Grid.Column="1" Time="{Binding FromTime}" Format="HH:mm"/>
+
+                    <Label Grid.Row="1" Grid.Column="2" Text="结束时间" VerticalOptions="Center"/>
+                    <!-- 24 小时制显示 -->
+                    <TimePicker Grid.Row="1" Grid.Column="3" Time="{Binding ToTime}" Format="HH:mm"/>
+
+                    <!-- 指标与按钮行 -->
+                    <Label Grid.Row="2" Grid.Column="0" Text="指标" VerticalOptions="Center"/>
+                    <Picker Grid.Row="2" Grid.Column="1"
+                            ItemsSource="{Binding Metrics}"
+                            SelectedItem="{Binding SelectedMetric}" />
+                    <Button Grid.Row="2" Grid.Column="2" Text="查询"  Command="{Binding QueryCommand}"/>
+                    <Button Grid.Row="2" Grid.Column="3"
+                            Text="清除所有历史"
+                            Clicked="OnClearAllClicked"
+                            WidthRequest="110"
+                            HorizontalOptions="Start"
+                            Margin="4,0"/>
+                </Grid>
+            </Frame>
+
+            <Frame>
+                <VerticalStackLayout Spacing="4" Padding="8">
+                    <!-- 图表顶部显示日期/时间范围（来自 ViewModel.ChartTitle）-->
+                    <Label Text="{Binding ChartTitle}"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+                    <mcharts:ChartView HeightRequest="200" Chart="{Binding Chart}" />
+
+                    <!-- 新增：固定的三个时间标签（左中右），放在图表下方，避免随数据折叠 -->
+                    <Grid ColumnDefinitions="*,*,*" Margin="0,6,0,0">
+                        <Label Grid.Column="0"
+                               Text="{Binding StartLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="Start"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="1"
+                               Text="{Binding MidLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="Center"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                        <Label Grid.Column="2"
+                               Text="{Binding EndLabel}"
+                               FontSize="12"
+                               HorizontalTextAlignment="End"
+                               LineBreakMode="NoWrap"
+                               VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame>
+                <CollectionView ItemsSource="{Binding Items}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid x:DataType="models:SensorData" ColumnDefinitions="*,Auto" Padding="4">
+                                <VerticalStackLayout>
+                                    <!-- 使用转换器把 UTC 的 DateTimeOffset 转为本地字符串 -->
+                                    <Label Text="{Binding Timestamp, Converter={StaticResource DtoToLocalConverter}, ConverterParameter='yyyy-MM-dd HH:mm:ss'}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Temperature, StringFormat='温度: {0:F1} ℃'}" FontSize="12"/>
+                                    <Label Text="{Binding Humidity, StringFormat='湿度: {0:F1} %'}" FontSize="12"/>
+                                    <Label Text="{Binding Smoke, StringFormat='烟雾: {0:F1}'}" FontSize="12"/>
+                                    <Label Text="{Binding Light, StringFormat='光照: {0:F0} lux'}" FontSize="12"/>
+                                    <Label Text="{Binding CO2, StringFormat='CO2: {0:F0} ppm'}" FontSize="12"/>
+                                    <Label Text="{Binding WaterLevel, StringFormat='水位: {0:F0} %'}" FontSize="12"/>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

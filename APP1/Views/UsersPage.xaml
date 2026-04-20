@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:conv="clr-namespace:SmartAgri.Converters"
+             xmlns:viewModels="clr-namespace:SmartAgri.ViewModels"
+             x:Class="SmartAgri.Views.UsersPage"
+             x:DataType="viewModels:UsersViewModel"
+             Title="用户管理">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <conv:DateTimeOffsetToLocalStringConverter x:Key="DtoToLocal" />
+            <conv:StringToIntConverter x:Key="StringToInt" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- 新增用户 -->
+            <Frame>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="新增用户" FontAttributes="Bold"/>
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <Label Text="用户名" Grid.Row="0" Grid.Column="0" VerticalOptions="Center"/>
+                        <Entry Grid.Row="0" Grid.Column="1" Text="{Binding NewUsername}" Placeholder="用户名"/>
+
+                        <Label Text="密码" Grid.Row="1" Grid.Column="0" VerticalOptions="Center"/>
+                        <Entry Grid.Row="1" Grid.Column="1" Text="{Binding NewPassword}" Placeholder="密码" IsPassword="True"/>
+
+                        <Label Text="角色" Grid.Row="2" Grid.Column="0" VerticalOptions="Center"/>
+                        <Picker Grid.Row="2" Grid.Column="1" Title="选择角色" SelectedIndexChanged="OnRoleChanged">
+                            <Picker.Items>
+                                <x:String>用户</x:String>
+                                <x:String>超级管理员</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        <Label Grid.Row="3" Grid.Column="0" Text="有效期（天）" VerticalOptions="Center"/>
+                        <Entry Grid.Row="3" Grid.Column="1"
+                   Keyboard="Numeric"
+                   Text="{Binding NewValidityDays, Converter={StaticResource StringToInt}}"
+                   Placeholder="如 180"/>
+                    </Grid>
+                    <Button Text="新增用户" Command="{Binding AddUserCommand}"/>
+                    <Label Text="{Binding Message}" TextColor="Red"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 系统设置（仅超级管理员可见），免登录开关开启为绿色 -->
+            <Frame>
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding CanManageNoLogin}">
+                    <Label Text="系统设置" FontAttributes="Bold"/>
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+                        <Label Grid.Column="0" Text="免登录模式" VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                    IsToggled="{Binding NoLoginEnabled}"
+                    OnColor="LimeGreen"
+                    ThumbColor="White"/>
+                    </Grid>
+                    <Label Text="注意：开启后,无需密码直接登录。"
+                 FontSize="12" TextColor="#666"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- 用户权限设置：不展示用户列表，改为按钮 + 管理面板 -->
+            <Frame>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="账户管理" FontAttributes="Bold"/>
+                    <Button Text="用户权限设置" Command="{Binding OpenManagePanelCommand}"/>
+
+                    <!-- 管理面板（展开后显示） -->
+                    <Grid IsVisible="{Binding IsManagePanelVisible}"
+                ColumnDefinitions="Auto,*"
+                RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+                Padding="8"
+                ColumnSpacing="8"
+                RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="选择用户" VerticalOptions="Center"/>
+                        <Picker Grid.Row="0" Grid.Column="1"
+                    ItemsSource="{Binding Users}"
+                    ItemDisplayBinding="{Binding Username}"
+                    SelectedItem="{Binding SelectedUser}"/>
+
+                        <Label Grid.Row="1" Grid.Column="1"
+                   Text="{Binding SelectedUser.Role, StringFormat='{0}'}"/>
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="有效期至" VerticalOptions="Center"/>
+                        <Label Grid.Row="2" Grid.Column="1"
+                   Text="{Binding SelectedUser.ExpiresAt, Converter={StaticResource DtoToLocal}, ConverterParameter='yyyy-MM-dd HH:mm'}"/>
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="启用状态" VerticalOptions="Center"/>
+                        <Label Grid.Row="3" Grid.Column="1"
+                   Text="{Binding SelectedUser.IsActive, StringFormat='启用：{0}'}"/>
+
+                        <HorizontalStackLayout Grid.Row="4" Grid.ColumnSpan="2" Spacing="8">
+                            <Button Text="启用"
+                      IsEnabled="{Binding CanActivate}"
+                      Command="{Binding ActivateUserCommand}"
+                      CommandParameter="{Binding SelectedUser}"/>
+                            <Button Text="停用"
+                      IsEnabled="{Binding CanDeactivate}"
+                      Command="{Binding DeactivateUserCommand}"
+                      CommandParameter="{Binding SelectedUser}"/>
+                            <Button Text="删除"
+                      TextColor="Red"
+                      IsEnabled="{Binding CanDelete}"
+                      Command="{Binding RemoveUserCommand}"
+                      CommandParameter="{Binding SelectedUser}"/>
+                            <Button Text="关闭" Command="{Binding CloseManagePanelCommand}" />
+                        </HorizontalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

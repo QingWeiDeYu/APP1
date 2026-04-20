@@ -1,0 +1,206 @@
+Model.cs
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microcharts;
+using SkiaSharp;
+using SmartAgri.Models;
+using SmartAgri.Services;
+using Microsoft.Maui.ApplicationModel; // MainThread
+using Microsoft.Maui.Storage;          // Preferences
+
+namespace SmartAgri.ViewModels;
+
+public partial class DashboardViewModel : ObservableObject
+{
+    private readonly DatabaseService _db;
+    private readonly WifiClientService _wifi;
+
+    private Thresholds _thresholds = new();
+    private CancellationTokenSource? _cts;
+
+    private const string PrefHost = "wifi_host";
+    private const string PrefPort = "wifi_port";
+
+    [ObservableProperty] private string host = "192.168.4.1";
+    [ObservableProperty] private int port = 9000;
+    [ObservableProperty] private bool isConnected;
+
+    [ObservableProperty] private double temperature;
+    [ObservableProperty] private double humidity;
+    [ObservableProperty] private double smoke;
+    [ObservableProperty] private double light;
+    [ObservableProperty] private double cO2;          // 生成属性名 CO2
+    [ObservableProperty] private double waterLevel;
+
+    // 阈值编辑绑定
+    [ObservableProperty] private double tempMin;
+    [ObservableProperty] private double tempMax;
+    [ObservableProperty] private double humMin;
+    [ObservableProperty] private double humMax;
+    [ObservableProperty] private double smokeMin;
+    [ObservableProperty] private double smokeMax;
+    [ObservableProperty] private double lightMin;
+    [ObservableProperty] private double lightMax;
+    [ObservableProperty] private double cO2Min;
+    [ObservableProperty] private double cO2Max;
+    [ObservableProperty] private double levelMin;
+    [ObservableProperty] private double levelMax;
+
+    public ObservableCollection<SensorData> Recent { get; } = new();
+    public ObservableCollection<RelayButton> Relays { get; } = new();
+
+    [ObservableProperty] private LineChart? tempChart;
+
+    public DashboardViewModel(DatabaseService db, WifiClientService wifi)
+    {
+        _db = db; _wifi = wifi;
+        _wifi.SensorDataReceived += OnSensorDataReceived;
+        _wifi.ConnectionStateChanged += (_, s) => IsConnected = s;
+
+        // 启动时恢复上次 Host/Port
+        Host = Preferences.Default.Get(PrefHost, "192.168.4.1");
+        Port = Preferences.Default.Get(PrefPort, 5577);
+    }
+
+    public async Task InitializeAsync()
+    {
+        _thresholds = await _db.Connection.Table<Thresholds>().FirstAsync();
+        ApplyThresholdsToVm(_thresholds);
+
+        // 加载继电器按钮（可在 UI 中增删改）
+        var relays = await _db.Connection.Table<RelayButton>().ToListAsync();
+        foreach (var r in relays) Relays.Add(r);
+    }
+
+    private void ApplyThresholdsToVm(Thresholds t)
+    {
+        TempMin = t.TempMin; TempMax = t.TempMax;
+        HumMin = t.HumMin; HumMax = t.HumMax;
+        SmokeMin = t.SmokeMin; SmokeMax = t.SmokeMax;
+        LightMin = t.LightMin; LightMax = t.LightMax;
+        CO2Min = t.CO2Min; CO2Max = t.CO2Max;
+        LevelMin = t.LevelMin; LevelMax = t.LevelMax;
+    }
+
+    // 当 Host/Port 被用户修改时自动持久化
+    partial void OnHostChanged(string value)
+        => Preferences.Default.Set(PrefHost, value ?? string.Empty);
+
+    partial void OnPortChanged(int value)
+    {
+        var safe = Math.Clamp(value, 1, 65535);
+        if (safe != value) Port = safe; // 回写合法范围
+        Preferences.Default.Set(PrefPort, safe);
+    }
+
+    [RelayCommand]
+    private async Task ConnectAsync()
+    {
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        await _wifi.ConnectAsync(Host, Port, _cts.Token);
+
+        // 连接成功后再次保存（确保最终值持久化）
+        Preferences.Default.Set(PrefHost, Host);
+        Preferences.Default.Set(PrefPort, Port);
+
+        // 初始下发阈值（无告警位）
+        await _wifi.SendThresholdsAsync(_thresholds, "000000");
+        // 周期心跳
+        _ = Task.Run(async () =>
+        {
+            while (!_cts.IsCancellationRequested)
+            {
+                try { await _wifi.SendPingAsync(); } catch { }
+                await Task.Delay(TimeSpan.FromSeconds(10), _cts.Token);
+            }
+        }, _cts.Token);
+    }
+
+    [RelayCommand]
+    private async Task SaveThresholdsAsync()
+    {
+        _thresholds.TempMin = TempMin; _thresholds.TempMax = TempMax;
+        _thresholds.HumMin = HumMin; _thresholds.HumMax = HumMax;
+        _thresholds.SmokeMin = SmokeMin; _thresholds.SmokeMax = SmokeMax;
+        _thresholds.LightMin = LightMin; _thresholds.LightMax = LightMax;
+        _thresholds.CO2Min = CO2Min; _thresholds.CO2Max = CO2Max;
+        _thresholds.LevelMin = LevelMin; _thresholds.LevelMax = LevelMax;
+
+        await _db.Connection.UpdateAsync(_thresholds);
+
+        // 实时下发阈值
+        await _wifi.SendThresholdsAsync(_thresholds, "000000");
+    }
+
+    private async void OnSensorDataReceived(object? sender, SensorData e)
+    {
+        Temperature = e.Temperature;
+        Humidity = e.Humidity;
+        Smoke = e.Smoke;
+        Light = e.Light;
+        CO2 = e.CO2;
+        WaterLevel = e.WaterLevel;
+
+        // 保存到本地
+        await _db.Connection.InsertAsync(e);
+
+        // 维护最近数据（做图表）
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            Recent.Add(e);
+            while (Recent.Count > 100) Recent.RemoveAt(0);
+            TempChart = BuildTempChart();
+        });
+
+        // 阈值判断与告警
+        var bits = AlarmService.BuildAlarmBits(e, _thresholds);
+        if (bits.Contains('1'))
+        {
+            await AlarmService.PlayAlarmAsync(bits);
+            await _wifi.SendAlarmAsync(bits);
+        }
+    }
+
+    private LineChart BuildTempChart()
+    {
+        var entries = Recent.Select(d => new ChartEntry((float)d.Temperature)
+        {
+            Color = SKColor.Parse("#ff5722"),
+            ValueLabel = d.Temperature.ToString("0.0")
+        }).ToList();
+
+        return new LineChart
+        {
+            Entries = entries,
+            LineMode = LineMode.Straight,
+            LineSize = 3,
+            PointMode = PointMode.Circle,
+            PointSize = 3
+        };
+    }
+
+    [RelayCommand]
+    private async Task TriggerRelayAsync(RelayButton relay)
+    {
+        if (relay.Mode == RelayMode.Immediate)
+        {
+            await _wifi.SendRelayImmediateAsync(relay.RelayId);
+            relay.LastTriggeredAt = DateTimeOffset.Now;
+            await _db.Connection.UpdateAsync(relay);
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(relay.StartHHmm) && !string.IsNullOrWhiteSpace(relay.EndHHmm))
+            {
+                await _wifi.SendRelayScheduleAsync(relay.RelayId, relay.StartHHmm!, relay.EndHHmm!);
+            }
+        }
+    }
+}
