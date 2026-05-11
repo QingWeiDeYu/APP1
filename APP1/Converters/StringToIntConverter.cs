@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Globalization;
 using Microsoft.Maui.Controls;
 
@@ -12,14 +12,14 @@ public sealed class StringToIntConverter : IValueConverter
     {
         if (value is string str && int.TryParse(str, out int result))
             return result;
-        return 0; // ªÚ’ﬂ return null£¨∏˘æ›ƒ„µƒ–Ë«Û
+        return 0; // ÊàñËÄÖ return nullÔºåÊ†πÊçÆ‰Ω†ÁöÑÈúÄÊ±Ç
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is int intValue)
             return intValue.ToString();
-        return string.Empty; // ªÚ’ﬂ return null£¨∏˘æ›ƒ„µƒ–Ë«Û
+        return string.Empty; // ÊàñËÄÖ return nullÔºåÊ†πÊçÆ‰Ω†ÁöÑÈúÄÊ±Ç
     }
 }
 #endif
@@ -27,19 +27,19 @@ public sealed class StringToIntConverter : IValueConverter
 
 public sealed class StringToIntConverter : IValueConverter
 {
-    // ∞Û∂®‘¥(int) -> ƒø±Í(string)
+    // ÁªëÂÆöÊ∫ê(int) -> ÁõÆÊ†á(string)
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is int i)
             return i.ToString(culture);
 
         if (value is string s)
-            return s; // »›¥Ì£∫»Ù±ææÕ « string
+            return s; // ÂÆπÈîôÔºöËã•Êú¨Â∞±ÊòØ string
 
         return string.Empty;
     }
 
-    // ∞Û∂®ƒø±Í(string) -> ‘¥(int)
+    // ÁªëÂÆöÁõÆÊ†á(string) -> Ê∫ê(int)
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string s && int.TryParse(s, NumberStyles.Integer, culture, out var i))

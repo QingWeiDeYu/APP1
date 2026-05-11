@@ -1,4 +1,4 @@
-using Microsoft.Maui;                   // IActivationState
+ï»¿using Microsoft.Maui;                   // IActivationState
 using Microsoft.Maui.ApplicationModel; // MainThread
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;          // Preferences
@@ -34,26 +34,26 @@ public partial class App : Application
         var shell = new AppShell();
         shell.Items.Clear();
 
-        // µÈ´ıÒ³£¨ÁÙÊ±£©
-        var autoLoginContent = new ShellContent { Route = "AutoLogin", Title = "Æô¶¯ÖĞ", Content = new AutoLoginPage() };
+        // ç­‰å¾…é¡µï¼ˆä¸´æ—¶ï¼‰
+        var autoLoginContent = new ShellContent { Route = "AutoLogin", Title = "å¯åŠ¨ä¸­", Content = new AutoLoginPage() };
 
-        // Õı³£Ò³Ãæ
-        var loginContent = new ShellContent { Route = "LoginPage", Title = "µÇÂ¼", Content = new LoginPage(loginVm) };
-        var dashboardContent = new ShellContent { Route = "DashboardPage", Title = "ÒÇ±íÅÌ", Content = new DashboardPage(dashboardVm) };
-        var usersContent = new ShellContent { Route = "UsersPage", Title = "ÓÃ»§¹ÜÀí", Content = new UsersPage(usersVm) };
-        var historyContent = new ShellContent { Route = "HistoryPage", Title = "ÀúÊ·¼ÇÂ¼", Content = new HistoryPage(historyVm) };
+        // æ­£å¸¸é¡µé¢
+        var loginContent = new ShellContent { Route = "LoginPage", Title = "ç™»å½•", Content = new LoginPage(loginVm) };
+        var dashboardContent = new ShellContent { Route = "DashboardPage", Title = "ä»ªè¡¨ç›˜", Content = new DashboardPage(dashboardVm) };
+        var usersContent = new ShellContent { Route = "UsersPage", Title = "ç”¨æˆ·ç®¡ç†", Content = new UsersPage(usersVm) };
+        var historyContent = new ShellContent { Route = "HistoryPage", Title = "å†å²è®°å½•", Content = new HistoryPage(historyVm) };
 
-        // ÏÈÌí¼ÓµÈ´ıÒ³
+        // å…ˆæ·»åŠ ç­‰å¾…é¡µ
         shell.Items.Add(autoLoginContent);
         shell.Items.Add(loginContent);
         shell.Items.Add(dashboardContent);
         shell.Items.Add(usersContent);
         shell.Items.Add(historyContent);
 
-        // Ä¬ÈÏ½ûÓÃ²Ëµ¥
+        // é»˜è®¤ç¦ç”¨èœå•
         shell.FlyoutBehavior = FlyoutBehavior.Disabled;
 
-        // µ¼º½À¹½Ø£ºÎ´µÇÂ¼½ûÖ¹·ÃÎÊ£»ÃâµÇÂ¼¿ª·ÅÒÇ±íÅÌ/ÀúÊ·¼ÇÂ¼£»ÓÃ»§¹ÜÀíĞè³¬¹Ü
+        // å¯¼èˆªæ‹¦æˆªï¼šæœªç™»å½•ç¦æ­¢è®¿é—®ï¼›å…ç™»å½•å¼€æ”¾ä»ªè¡¨ç›˜/å†å²è®°å½•ï¼›ç”¨æˆ·ç®¡ç†éœ€è¶…ç®¡
         var restricted = new[] { "DashboardPage", "UsersPage", "HistoryPage" };
         shell.Navigating += async (_, e) =>
         {
@@ -67,11 +67,11 @@ public partial class App : Application
                 if (toRestricted && !auth.IsAuthenticated)
                 {
                     if (noLoginEnabled && !toUsers)
-                        return; // ÃâµÇÂ¼·ÅĞĞ ÒÇ±íÅÌ/ÀúÊ·¼ÇÂ¼
+                        return; // å…ç™»å½•æ”¾è¡Œ ä»ªè¡¨ç›˜/å†å²è®°å½•
 
                     e.Cancel();
                     await MainThread.InvokeOnMainThreadAsync(() =>
-                        shell.DisplayAlert("ÌáÊ¾", "ÇëÏÈµÇÂ¼ºóÔÙÊ¹ÓÃ¸Ã¹¦ÄÜ¡£", "È·¶¨"));
+                        shell.DisplayAlert("æç¤º", "è¯·å…ˆç™»å½•åå†ä½¿ç”¨è¯¥åŠŸèƒ½ã€‚", "ç¡®å®š"));
                     return;
                 }
 
@@ -79,50 +79,50 @@ public partial class App : Application
                 {
                     e.Cancel();
                     await MainThread.InvokeOnMainThreadAsync(() =>
-                        shell.DisplayAlert("È¨ÏŞ²»×ã", "Ö»ÓĞ³¬¼¶¹ÜÀíÔ±¿ÉÒÔ·ÃÎÊÓÃ»§¹ÜÀí¡£", "È·¶¨"));
+                        shell.DisplayAlert("æƒé™ä¸è¶³", "åªæœ‰è¶…çº§ç®¡ç†å‘˜å¯ä»¥è®¿é—®ç”¨æˆ·ç®¡ç†ã€‚", "ç¡®å®š"));
                     return;
                 }
             }
             catch { }
         };
 
-        // µÇÂ¼ºó£ºÆôÓÃ²Ëµ¥
+        // ç™»å½•åï¼šå¯ç”¨èœå•
         auth.LoggedIn += (_, __) =>
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 shell.FlyoutBehavior = FlyoutBehavior.Flyout;
-                loginContent.Title = "ÇĞ»»ÕËºÅ";
+                loginContent.Title = "åˆ‡æ¢è´¦å·";
             });
         };
 
-        // µÇ³ö£º½ûÓÃ²Ëµ¥
+        // ç™»å‡ºï¼šç¦ç”¨èœå•
         auth.LoggedOut += (_, __) =>
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 shell.FlyoutBehavior = FlyoutBehavior.Disabled;
-                loginContent.Title = "µÇÂ¼";
+                loginContent.Title = "ç™»å½•";
                 _ = shell.GoToAsync("//LoginPage");
             });
         };
 
-        // ³õÊ¼ÇĞµ½µÈ´ıÒ³
+        // åˆå§‹åˆ‡åˆ°ç­‰å¾…é¡µ
         shell.CurrentItem = autoLoginContent;
 
-        // Æô¶¯ºóÒì²½Ö´ĞĞÃâµÇÂ¼/Ìø×ª
+        // å¯åŠ¨åå¼‚æ­¥æ‰§è¡Œå…ç™»å½•/è·³è½¬
         _ = Task.Run(async () =>
         {
             try
             {
-                await Task.Delay(300); // ·ÀÉÁÆÁ
+                await Task.Delay(300); // é˜²é—ªå±
                 var noLogin = Preferences.Default.Get("no_login_enabled", false);
 
                 await MainThread.InvokeOnMainThreadAsync(() =>
                 {
                     if (noLogin)
                     {
-                        // ·Ã¿ÍÄ£Ê½£º²»¿ªÆô¹ÜÀíÔ±È¨ÏŞ£¬µ«·ÅĞĞÒµÎñ¹¦ÄÜ
+                        // è®¿å®¢æ¨¡å¼ï¼šä¸å¼€å¯ç®¡ç†å‘˜æƒé™ï¼Œä½†æ”¾è¡Œä¸šåŠ¡åŠŸèƒ½
                         shell.FlyoutBehavior = FlyoutBehavior.Flyout;
                         shell.CurrentItem = dashboardContent;
                     }
@@ -131,7 +131,7 @@ public partial class App : Application
                         shell.CurrentItem = loginContent;
                     }
 
-                    shell.Items.Remove(autoLoginContent); // ÒÆ³ıÁÙÊ±µÈ´ıÒ³
+                    shell.Items.Remove(autoLoginContent); // ç§»é™¤ä¸´æ—¶ç­‰å¾…é¡µ
                 });
             }
             catch
@@ -144,7 +144,7 @@ public partial class App : Application
             }
         });
 
-        // ¹Ø¼ü£ºÍ¨¹ı CreateWindow ·µ»Ø´°¿Ú£¬±ÜÃâÉèÖÃ MainPage
+        // å…³é”®ï¼šé€šè¿‡ CreateWindow è¿”å›çª—å£ï¼Œé¿å…è®¾ç½® MainPage
         return new Window(shell);
     }
 }

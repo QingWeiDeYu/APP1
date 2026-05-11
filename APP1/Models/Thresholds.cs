@@ -1,4 +1,4 @@
-using SQLite;
+ï»¿using SQLite;
 
 namespace SmartAgri.Models;
 
@@ -25,7 +25,7 @@ public class Thresholds
     public double LevelMin { get; set; } = 0;
     public double LevelMax { get; set; } = 100;
 
-    // Éú³ÉãĞÖµÍ¬²½±¨ÎÄ
+    // ç”Ÿæˆé˜ˆå€¼åŒæ­¥æŠ¥æ–‡
     public string ToProtocolString(string alarmFlagsBits)
     {
         return $"THR,{TempMin},{TempMax},{HumMin},{HumMax},{SmokeMin},{SmokeMax},{LightMin},{LightMax},{CO2Min},{CO2Max},{LevelMin},{LevelMax},{alarmFlagsBits}\r\n";

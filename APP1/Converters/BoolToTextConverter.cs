@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Globalization;
 using Microsoft.Maui.Controls;
 
@@ -6,15 +6,15 @@ namespace SmartAgri.Converters;
 
 public class BoolToTextConverter : IValueConverter
 {
-    // ConverterParameter ĞÎÈç "ÒÑÁ¬|Á¬½Ó"
+    // ConverterParameter å½¢å¦‚ "å·²è¿|è¿æ¥"
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var s = parameter as string ?? "ÒÑÁ¬|Á¬½Ó";
+        var s = parameter as string ?? "å·²è¿|è¿æ¥";
         var parts = s.Split('|', 2, StringSplitOptions.None);
-        var trueText = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : "ÒÑÁ¬";
-        var falseText = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : "Á¬½Ó";
+        var trueText = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : "å·²è¿";
+        var falseText = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : "è¿æ¥";
 
-        var isTrue = value is true; // Ö§³Ö null/·Ç bool Ê±°´ false ´¦Àí
+        var isTrue = value is true; // æ”¯æŒ null/é bool æ—¶æŒ‰ false å¤„ç†
         return isTrue ? trueText : falseText;
     }
 

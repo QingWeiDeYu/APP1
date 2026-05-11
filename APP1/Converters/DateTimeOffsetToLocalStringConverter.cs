@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Globalization;
 using Microsoft.Maui.Controls;
 
@@ -6,7 +6,7 @@ namespace SmartAgri.Converters;
 
 public class DateTimeOffsetToLocalStringConverter : IValueConverter
 {
-    // ConverterParameter Àý£º"yyyy-MM-dd HH:mm"
+    // ConverterParameter ä¾‹ï¼š"yyyy-MM-dd HH:mm"
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not DateTimeOffset dto) return string.Empty;

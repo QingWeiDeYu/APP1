@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+ï»¿using System.Threading.Tasks;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -43,11 +43,11 @@ public partial class LoginViewModel : ObservableObject
         var user = await _auth.LoginAsync(Username, Password);
         if (user == null)
         {
-            Message = "µÇÂ¼Ê§°Ü»òÕËºÅ¹ıÆÚ";
+            Message = "ç™»å½•å¤±è´¥æˆ–è´¦å·è¿‡æœŸ";
             return;
         }
         CurrentUser = user;
-        // Ìø×ªµ½ÒÇ±íÅÌ
+        // è·³è½¬åˆ°ä»ªè¡¨ç›˜
         await Shell.Current.GoToAsync("//DashboardPage");
     }
 }
